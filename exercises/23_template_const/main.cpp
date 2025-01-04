@@ -11,6 +11,13 @@ struct Tensor {
     Tensor(unsigned int const shape_[N]) {
         unsigned int size = 1;
         // TODO: 填入正确的 shape 并计算 size
+        /*Add code start*/
+        for (int i = 0;i<N;++i)
+        {
+            shape[i] = shape_[i];
+            size *= shape_[i];
+        }
+        /*Add code end*/
         data = new T[size];
         std::memset(data, 0, size * sizeof(T));
     }
@@ -30,14 +37,20 @@ struct Tensor {
     }
 
 private:
-    unsigned int data_index(unsigned int const indices[N]) const {
-        unsigned int index = 0;
-        for (unsigned int i = 0; i < N; ++i) {
-            ASSERT(indices[i] < shape[i], "Invalid index");
-            // TODO: 计算 index
-        }
-        return index;
+unsigned int data_index(unsigned int const indices[N]) const 
+{
+    unsigned int index = 0;  // 最终的线性索引
+    unsigned int stride = 1;  // 步长（从最低维度开始）
+
+    for (int i = N - 1; i >= 0; --i) 
+    {  
+        // 从最后一个维度开始计算
+        index += indices[i] * stride;  // 当前维度的索引值乘以步长
+        stride *= shape[i];  // 更新步长：乘以当前维度的大小
     }
+
+    return index;  // 返回线性索引
+}
 };
 
 // ---- 不要修改以下代码 ----

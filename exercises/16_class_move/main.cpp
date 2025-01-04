@@ -10,26 +10,49 @@
 // READ: 运算符重载 <https://zh.cppreference.com/w/cpp/language/operators>
 
 class DynFibonacci {
-    size_t *cache;
-    int cached;
+    size_t *cache; // 缓存数组指针
+    int cached;    // 当前缓存的最大索引
 
 public:
     // TODO: 实现动态设置容量的构造器
-    DynFibonacci(int capacity): cache(new ?), cached(?) {}
+    DynFibonacci(int capacity)
+        : cache(new size_t[capacity]), cached(2) {
+        cache[0] = 0; // F(0) = 0
+        cache[1] = 1; // F(1) = 1
+    }
 
     // TODO: 实现移动构造器
-    DynFibonacci(DynFibonacci &&) noexcept = delete;
+    DynFibonacci(DynFibonacci &&other) noexcept
+        : cache(other.cache), cached(other.cached) {
+        other.cache = nullptr; // 将源对象的指针置空，表示资源被转移
+        other.cached = 0;      // 重置源对象状态
+    }
 
     // TODO: 实现移动赋值
-    // NOTICE: ⚠ 注意移动到自身问题 ⚠
-    DynFibonacci &operator=(DynFibonacci &&) noexcept = delete;
+    DynFibonacci &operator=(DynFibonacci &&other) noexcept {
+        if (this != &other) { // 防止自赋值
+            delete[] cache;   // 释放当前对象的资源
+            cache = other.cache; // 转移资源
+            cached = other.cached;
+
+            other.cache = nullptr; // 将源对象的指针置空，表示资源被转移
+            other.cached = 0;      // 重置源对象状态
+        }
+        return *this;
+    }
 
     // TODO: 实现析构器，释放缓存空间
-    ~DynFibonacci();
+    ~DynFibonacci() {
+        delete[] cache;
+    }
 
     // TODO: 实现正确的缓存优化斐波那契计算
     size_t operator[](int i) {
-        for (; false; ++cached) {
+        if (i < 0) {
+            ASSERT(false, "i must be non-negative");
+        }
+        // 如果请求的索引超出缓存范围，计算新值并缓存
+        for (; cached <= i; ++cached) {
             cache[cached] = cache[cached - 1] + cache[cached - 2];
         }
         return cache[i];

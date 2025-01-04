@@ -10,6 +10,13 @@ struct Tensor4D {
     Tensor4D(unsigned int const shape_[4], T const *data_) {
         unsigned int size = 1;
         // TODO: 填入正确的 shape 并计算 size
+        /* Add code start*/
+        for (int i = 0; i < 4; ++i) 
+        {
+            shape[i] = shape_[i];  // 复制形状
+            size *= shape_[i];     // size是张量总大小
+        }
+        /* Add code end*/
         data = new T[size];
         std::memcpy(data, data_, size * sizeof(T));
     }
@@ -26,8 +33,30 @@ struct Tensor4D {
     // `others` 长度为 1 但 `this` 长度不为 1 的维度将发生广播计算。
     // 例如，`this` 形状为 `[1, 2, 3, 4]`，`others` 形状为 `[1, 2, 1, 4]`，
     // 则 `this` 与 `others` 相加时，3 个形状为 `[1, 2, 1, 4]` 的子张量各自与 `others` 对应项相加。
-    Tensor4D &operator+=(Tensor4D const &others) {
-        // TODO: 实现单向广播的加法
+       Tensor4D &operator+=(Tensor4D const &others) {
+        // 四重循环遍历 this 的每一个位置 (i, j, k, l)
+        for (unsigned int i = 0; i < shape[0]; ++i) {
+            // others 在第 0 维如果是 1，就只用下标 0，否则用 i
+            unsigned int i_ = (others.shape[0] == 1) ? 0 : i;
+
+            for (unsigned int j = 0; j < shape[1]; ++j) {
+                unsigned int j_ = (others.shape[1] == 1) ? 0 : j;
+
+                for (unsigned int k = 0; k < shape[2]; ++k) {
+                    unsigned int k_ = (others.shape[2] == 1) ? 0 : k;
+
+                    for (unsigned int l = 0; l < shape[3]; ++l) {
+                        unsigned int l_ = (others.shape[3] == 1) ? 0 : l;
+
+                        // 将 (i,j,k,l) 和 (i_,j_,k_,l_) 映射到一维索引
+                        unsigned int idx_this   = ((i  * shape[1]  + j ) * shape[2]  + k ) * shape[3]  + l;
+                        unsigned int idx_others = ((i_ * others.shape[1] + j_) * others.shape[2] + k_) * others.shape[3] + l_;
+
+                        data[idx_this] += others.data[idx_others];
+                    }
+                }
+            }
+        }
         return *this;
     }
 };
@@ -46,8 +75,8 @@ int main(int argc, char **argv) {
             17, 18, 19, 20,
             21, 22, 23, 24};
         // clang-format on
-        auto t0 = Tensor4D(shape, data);
-        auto t1 = Tensor4D(shape, data);
+        auto t0 = Tensor4D<int>(shape, data);
+        auto t1 = Tensor4D<int>(shape, data);
         t0 += t1;
         for (auto i = 0u; i < sizeof(data) / sizeof(*data); ++i) {
             ASSERT(t0.data[i] == data[i] * 2, "Tensor doubled by plus its self.");
@@ -77,8 +106,8 @@ int main(int argc, char **argv) {
             1};
         // clang-format on
 
-        auto t0 = Tensor4D(s0, d0);
-        auto t1 = Tensor4D(s1, d1);
+        auto t0 = Tensor4D<float>(s0, d0);
+        auto t1 = Tensor4D<float>(s1, d1);
         t0 += t1;
         for (auto i = 0u; i < sizeof(d0) / sizeof(*d0); ++i) {
             ASSERT(t0.data[i] == 7.f, "Every element of t0 should be 7 after adding t1 to it.");
@@ -99,8 +128,8 @@ int main(int argc, char **argv) {
         unsigned int s1[]{1, 1, 1, 1};
         double d1[]{1};
 
-        auto t0 = Tensor4D(s0, d0);
-        auto t1 = Tensor4D(s1, d1);
+        auto t0 = Tensor4D<double>(s0, d0);
+        auto t1 = Tensor4D<double>(s1, d1);
         t0 += t1;
         for (auto i = 0u; i < sizeof(d0) / sizeof(*d0); ++i) {
             ASSERT(t0.data[i] == d0[i] + 1, "Every element of t0 should be incremented by 1 after adding t1 to it.");

@@ -3,24 +3,38 @@
 // READ: 复制构造函数 <https://zh.cppreference.com/w/cpp/language/copy_constructor>
 // READ: 函数定义（显式弃置）<https://zh.cppreference.com/w/cpp/language/function>
 
-
 class DynFibonacci {
-    size_t *cache;
-    int cached;
+    size_t *cache; // 指向缓存数组
+    int cached;    // 当前缓存的最大索引
 
 public:
     // TODO: 实现动态设置容量的构造器
-    DynFibonacci(int capacity): cache(new ?), cached(?) {}
+    DynFibonacci(int capacity)
+        : cache(new size_t[capacity]), cached(2) { // 初始化缓存
+        cache[0] = 0;  // F(0) = 0
+        cache[1] = 1;  // F(1) = 1
+    }
 
     // TODO: 实现复制构造器
-    DynFibonacci(DynFibonacci const &) = delete;
+    DynFibonacci(DynFibonacci const &other)
+        : cache(new size_t[other.cached + 1]), cached(other.cached) {
+        for (int i = 0; i <= cached; ++i) {
+            cache[i] = other.cache[i];
+        }
+    }
 
     // TODO: 实现析构器，释放缓存空间
-    ~DynFibonacci();
+    ~DynFibonacci() {
+        delete[] cache;
+    }
 
     // TODO: 实现正确的缓存优化斐波那契计算
     size_t get(int i) {
-        for (; false; ++cached) {
+        if (i < 0) {
+            ASSERT(false, "i must be non-negative");
+        }
+        // 如果请求的值超出当前缓存，需要计算新的值并缓存
+        for (; cached <= i; ++cached) {
             cache[cached] = cache[cached - 1] + cache[cached - 2];
         }
         return cache[i];

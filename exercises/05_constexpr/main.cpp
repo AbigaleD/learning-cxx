@@ -1,13 +1,27 @@
 #include "../exercise.h"
 
-constexpr unsigned long long fibonacci(int i) {
-    switch (i) {
+constexpr unsigned long long fibonacci(int i) 
+{
+    long long a = 0;
+    long long b = 1;
+    long long c = a+b;
+    switch (i) 
+    {
         case 0:
             return 0;
         case 1:
             return 1;
+        case 2:
+            return 2;
         default:
-            return fibonacci(i - 1) + fibonacci(i - 2);
+            
+            for(int iter = 2;iter <= i;++iter)
+            {
+                c = a+b;
+                a = b;
+                b = c;
+            }
+            return c;
     }
 }
 
