@@ -19,7 +19,7 @@ int main(int argc, char **argv) {
 
     // Platform-dependent value. Fill based on your CI environment.
     std::cout<<sizeof(vec)<<std::endl;
-    ASSERT(sizeof(vec) == 24, "Fill in the correct value."); // Example value for `sizeof(vec)`
+    ASSERT(sizeof(vec) == 40, "Fill in the correct value."); // Example value for `sizeof(vec)`
 
     {
         vec[20] = false; // Set element 20 to `false`
