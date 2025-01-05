@@ -18,7 +18,7 @@ struct Tensor4D {
         }
         /* Add code end*/
         data = new T[size];
-        std::memcpy(data, data_, size * sizeof(T));
+        memcpy(data, data_, size * sizeof(T));
     }
     ~Tensor4D() {
         delete[] data;
