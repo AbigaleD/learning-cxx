@@ -18,7 +18,8 @@ int main(int argc, char **argv) {
     std::cout << "sizeof(std::vector<bool>) = " << sizeof(std::vector<bool>) << std::endl;
 
     // Platform-dependent value. Fill based on your CI environment.
-    ASSERT(sizeof(vec) == sizeof(vec), "Fill in the correct value."); // Example value for `sizeof(vec)`
+    std::cout<<sizeof(vec)<<std::endl;
+    ASSERT(sizeof(vec) == 24, "Fill in the correct value."); // Example value for `sizeof(vec)`
 
     {
         vec[20] = false; // Set element 20 to `false`
